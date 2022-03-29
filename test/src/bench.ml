@@ -1,17 +1,16 @@
 open Bechamel
 open Toolkit
-open Ocamlrs_test
 
 let test_func =
-  Test.make ~name:"func"
+  Bechamel.Test.make ~name:"func"
     (Staged.stage Runtime.func)
 
 let test_native_func =
-  Test.make ~name:"native_func"
+  Bechamel.Test.make ~name:"native_func"
     (Staged.stage Runtime.func)
 
 
-let tests = (Test.make_grouped ~name:"call overhead" ~fmt:"%s %s" [ test_func; test_native_func ])
+let tests = (Bechamel.Test.make_grouped ~name:"call overhead" ~fmt:"%s %s" [ test_func; test_native_func ])
 
 let cfg = Benchmark.cfg ~limit:2000 ~quota:(Time.second 5.0) ~kde:(Some 1000) ()
 
@@ -37,7 +36,7 @@ let img (window, results) =
 
 open Notty_unix
 
-let () =
+let run () =
   let window =
     match winsize Unix.stdout with
     | Some (w, h) -> { Bechamel_notty.w; h }

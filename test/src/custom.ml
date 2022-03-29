@@ -1,3 +1,5 @@
+open Util
+
 type testing
 
 external testing_alloc: int64 -> testing = "testing_alloc"
@@ -5,9 +7,9 @@ external testing_set_c: testing -> string -> unit = "testing_set_c"
 external testing_set_a: testing -> float -> unit = "testing_set_a"
 external testing_get_values: testing -> (float * int64 * string) = "testing_get_values"
 
-let%test "testing compare 1" = Util.check_leaks (fun () -> testing_alloc 0L <> testing_alloc 1L)
-let%test "testing compare 2" = Util.check_leaks (fun () -> testing_alloc 99L = testing_alloc 99L)
-let%test "testing set c" = Util.check_leaks (fun () -> (
+let () = test "testing compare 1" (fun () -> testing_alloc 0L <> testing_alloc 1L)
+let () = test "testing compare 2" (fun () -> testing_alloc 99L = testing_alloc 99L)
+let () = test "testing set c" (fun () -> (
   let t = testing_alloc 1L in
   let () = Util.gc () in
   testing_set_a t 3.14;
@@ -23,16 +25,18 @@ type testing_callback
 external testing_callback_alloc: (int -> float) -> testing_callback = "testing_callback_alloc"
 external testing_callback_call: testing_callback -> int -> float = "testing_callback_call"
 
-let%test "testing callback 1" = Util.check_leaks (fun () -> (
+let () = test "testing callback 1" (fun () -> (
   let c = testing_callback_alloc (fun x -> float_of_int x *. 2.) in
   Util.gc ();
   testing_callback_call c 1 = 2.0)
 )
 
-let%test "testing callback 2" = Util.check_leaks (fun () -> (
+let () = test "testing callback 2" (fun () -> (
   let c = testing_callback_alloc (fun x ->
     let () = Unix.sleep 2 in
     sin (float_of_int x)) in
   Util.gc ();
   testing_callback_call c 5 = sin 5.0)
 )
+
+let () = run "custom"

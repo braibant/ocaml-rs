@@ -4,7 +4,7 @@ test-rust:
 	@cargo test --features=link -- --test-threads=1
 
 test-ocaml:
-	@dune runtest --root=test --force --no-buffer
+	@dune exec --root=test --force --no-buffer src/test.exe
 
 utop:
 	@dune utop --root=test
